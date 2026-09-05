@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Tool Hub</title>
+<meta name="description" content="Smart Tool Hub - Free online calculators and useful tools.">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}
+header{background:#111827;color:white;padding:28px 16px;text-align:center}
+header h1{margin:0 0 8px;font-size:32px}header p{margin:0;color:#cbd5e1}
+.container{max-width:1000px;margin:auto;padding:22px 15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:15px}
+.card{background:white;border-radius:16px;padding:20px;box-shadow:0 5px 18px #00000010}
+.card h2{font-size:20px;margin:5px 0 8px}.card p{color:#64748b;font-size:14px}
+button{border:0;border-radius:10px;padding:11px 15px;background:#2563eb;color:white;font-weight:bold;cursor:pointer}
+input,select{width:100%;padding:11px;margin:7px 0;border:1px solid #cbd5e1;border-radius:9px}
+.tool{margin-top:20px}.result{font-weight:bold;margin-top:10px;padding:10px;background:#eef2ff;border-radius:9px}
+footer{text-align:center;padding:25px;color:#64748b}
+</style>
+</head>
+<body>
+<header>
+<h1>🛠️ Smart Tool Hub</h1>
+<p>Free & Easy Online Tools</p>
+</header>
+
+<div class="container">
+<div class="grid">
+<div class="card"><h2>🎂 Age Calculator</h2><p>Apni age calculate karein.</p>
+<input type="date" id="dob"><button onclick="ageCalc()">Calculate</button><div id="ageResult" class="result"></div></div>
+
+<div class="card"><h2>📊 Percentage</h2><p>Percentage aasani se nikalein.</p>
+<input type="number" id="obt" placeholder="Obtained">
+<input type="number" id="total" placeholder="Total">
+<button onclick="percentCalc()">Calculate</button><div id="percentResult" class="result"></div></div>
+
+<div class="card"><h2>💰 EMI Calculator</h2><p>Monthly EMI estimate karein.</p>
+<input type="number" id="loan" placeholder="Loan amount ₹">
+<input type="number" id="rate" placeholder="Annual interest %">
+<input type="number" id="months" placeholder="Months">
+<button onclick="emiCalc()">Calculate</button><div id="emiResult" class="result"></div></div>
+
+<div class="card"><h2>🧾 GST Calculator</h2><p>GST amount calculate karein.</p>
+<input type="number" id="price" placeholder="Amount ₹">
+<input type="number" id="gst" placeholder="GST %">
+<button onclick="gstCalc()">Calculate</button><div id="gstResult" class="result"></div></div>
+
+<div class="card"><h2>📏 Unit Converter</h2><p>Km, meter aur feet convert karein.</p>
+<input type="number" id="unitVal" placeholder="Value">
+<select id="unitType"><option value="km_m">KM → Meter</option><option value="m_km">Meter → KM</option><option value="ft_m">Feet → Meter</option><option value="m_ft">Meter → Feet</option></select>
+<button onclick="unitCalc()">Convert</button><div id="unitResult" class="result"></div></div>
+
+<div class="card"><h2>🖼️ Image Compressor</h2><p>Image ko browser mein compress karein.</p>
+<input type="file" id="imgFile" accept="image/*">
+<button onclick="compressImage()">Compress</button><div id="imgResult" class="result"></div></div>
+</div>
+</div>
+
+<footer>© 2026 Smart Tool Hub • Free Online Tools</footer>
+
+<script>
+function ageCalc(){
+ const d=new Date(document.getElementById('dob').value), n=new Date();
+ if(!document.getElementById('dob').value){ageResult.textContent="Date select karein.";return}
+ let y=n.getFullYear()-d.getFullYear(), m=n.getMonth()-d.getMonth();
+ if(m<0||(m===0&&n.getDate()<d.getDate()))y--;
+ ageResult.textContent="Age: "+y+" years";
+}
+function percentCalc(){
+ let a=+obt.value,b=+total.value;
+ percentResult.textContent=b>0?((a/b)*100).toFixed(2)+"%":"Valid values enter karein.";
+}
+function emiCalc(){
+ let P=+loan.value, r=(+rate.value)/1200, n=+months.value;
+ if(P<=0||n<=0){emiResult.textContent="Valid values enter karein.";return}
+ let e=r?P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1):P/n;
+ emiResult.textContent="Monthly EMI: ₹"+e.toFixed(2);
+}
+function gstCalc(){
+ let p=+price.value,g=+gst.value;
+ if(p<0||g<0){gstResult.textContent="Valid values enter karein.";return}
+ let x=p*g/100; gstResult.textContent="GST: ₹"+x.toFixed(2)+" | Total: ₹"+(p+x).toFixed(2);
+}
+function unitCalc(){
+ let v=+unitVal.value,t=unitType.value,r;
+ if(t==="km_m")r=v*1000;if(t==="m_km")r=v/1000;if(t==="ft_m")r=v*0.3048;if(t==="m_ft")r=v*3.28084;
+ unitResult.textContent="Result: "+r;
+}
+function compressImage(){
+ const f=imgFile.files[0];
+ if(!f){imgResult.textContent="Image select karein.";return}
+ const reader=new FileReader();
+ reader.onload=e=>{
+  const img=new Image();
+  img.onload=()=>{
+   const c=document.createElement("canvas"),max=1200,s=Math.min(1,max/img.width);
+   c.width=img.width*s;c.height=img.height*s;
+   c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+   c.toBlob(blob=>{
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="compressed-image.jpg";a.textContent="Download compressed image";a.style.display="block";a.style.marginTop="10px";imgResult.innerHTML="Done — ";imgResult.appendChild(a);
+   },"image/jpeg",.65);
+  };img.src=e.target.result;
+ };reader.readAsDataURL(f);
+}
+</script>
+</body>
+</html>
